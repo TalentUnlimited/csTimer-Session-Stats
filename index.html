@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>View Your Solves!</title>
+	
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+	
+</head>
+<body>
+	<div style="width: 100%;">
+		<canvas id="myChart"></canvas>
+	</div>
+	
+	<script>
+		myChart = document.getElementById('myChart');
+		
+		new Chart(myChart, {
+			type: 'line',
+			data: {
+			datasets: [{	
+				label: 'Solves',
+				data: [],
+				borderWidth: 1
+			}]
+			},
+			options: {
+				scales: {
+					y: {
+					beginAtZero: true
+					}
+				},
+				parsing: {
+					xAxisKey: 'number',
+					yAxisKey: 'value'
+				}
+			}
+		});
+
+		function myFunction(){
+			const uploadInput = document.getElementById("file");
+
+			input = uploadInput.files[0];
+
+			const reader = new FileReader();
+  
+			reader.onload = function (e) {
+				const text = e.target.result;
+
+				const csvData = d3.csvParse(text);
+				
+				const list_solves = [];
+
+				for(var i = 0; i<csvData.length; i++) {
+					let temp = {'number': i.toString(), 'value': 0};
+					
+					temp['value']=(csvData[i]['No.;Time;Comment;Scramble;Date;P.1'].split(";")[1]);
+
+					list_solves.push(temp);
+				};
+				//console.log(list_solves);
+				//-----------
+				
+				const chart = Chart.getChart("myChart");
+				
+				chart.data.datasets[0].data = list_solves;
+				chart.update();
+
+			};
+
+			reader.readAsText(input);
+		}
+		
+	</script>
+
+
+	<label for="file">File</label>
+	<input id="file" name="file" type="file" accept=".csv" />
+	<button onclick="myFunction()">Upload</button>
+
+</body>
+</html>
